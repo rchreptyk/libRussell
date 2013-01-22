@@ -1,6 +1,6 @@
 #include "rString.h"
 
-struct rStringStruct
+struct stringStruct
 {
 	List * characters;
 	char * cString;
@@ -10,13 +10,17 @@ static int cStringLength(char *);
 static void * copyCharacter(void * ch);
 
 static int compareCaseSensitive(void * v1, void * v2);
-static rString * stringFromList(List * list);
+static String * stringFromList(List * list);
+
+
+/*static String * characterListToString(void * ch);
+static String * voidToString(void * v);*/
 
 /* Constructors and Destructors */
 
-rString * rString_create(char * cStr)
+String * String_create(char * cStr)
 {
-	rString * string;
+	String * string;
 	List * characters;
 	int i = 0;
 	int length;
@@ -28,7 +32,7 @@ rString * rString_create(char * cStr)
 	if(characters == NULL)
 		return NULL;
 
-	string = malloc(sizeof(rString));
+	string = malloc(sizeof(String));
 	if(string == NULL)
 		return NULL;
 
@@ -40,7 +44,7 @@ rString * rString_create(char * cStr)
 	{
 		if(!List_addBack(string->characters, copyCharacter(&cStr[i])))
 		{
-			rString_destroy(string);
+			String_destroy(string);
 			return NULL;
 		}
 	}
@@ -48,12 +52,12 @@ rString * rString_create(char * cStr)
 	return string;
 }
 
-rString * rString_createEmpty()
+String * String_createEmpty()
 {
-	return rString_create("");
+	return String_create("");
 }
 
-Boolean rString_destroy(rString * string)
+Boolean String_destroy(String * string)
 {
 	if(string == NULL)
 		return false;
@@ -77,9 +81,9 @@ Boolean rString_destroy(rString * string)
 
 /* Operations */
 
-rString * rString_copy(rString * string)
+String * String_copy(String * string)
 {
-	rString *newString;
+	String *newString;
 	List * characters;
 
 	if(string == NULL)
@@ -93,7 +97,7 @@ rString * rString_copy(rString * string)
 	if(characters == NULL)
 		return NULL;
 
-	newString = malloc(sizeof(rString));
+	newString = malloc(sizeof(String));
 	if(newString == NULL)
 		return NULL;
 
@@ -103,7 +107,7 @@ rString * rString_copy(rString * string)
 	return newString;
 }
 
-Boolean rString_append(rString * string, rString * stringToAppend)
+Boolean String_append(String * string, String * stringToAppend)
 {
 	List * appendedCharacters, * tmpAppendedCharacters;
 
@@ -125,7 +129,7 @@ Boolean rString_append(rString * string, rString * stringToAppend)
 	return true;
 }
 
-Boolean rString_appendChar(rString * string, char ch)
+Boolean String_appendChar(String * string, char ch)
 {
 	if(string == NULL)
 		return false;
@@ -136,9 +140,9 @@ Boolean rString_appendChar(rString * string, char ch)
 	return List_addBack(string->characters, copyCharacter(&ch));
 }
 
-rString * rString_concat(rString * first, rString * second)
+String * String_concat(String * first, String * second)
 {
-	rString * newString;
+	String * newString;
 
 	if(first == NULL || second == NULL)
 		return NULL;
@@ -146,11 +150,11 @@ rString * rString_concat(rString * first, rString * second)
 	if(first->characters == NULL || second->characters == NULL)
 		return NULL;
 
-	newString = rString_copy(first);
+	newString = String_copy(first);
 
-	if(!rString_append(newString, second))
+	if(!String_append(newString, second))
 	{
-		rString_destroy(newString);
+		String_destroy(newString);
 		return NULL;
 	}
 
@@ -160,12 +164,14 @@ rString * rString_concat(rString * first, rString * second)
 	return newString;
 }
 
-List * rString_split(rString * string, rString * delimiter)
+List * String_split(String * string, String * delimiter)
 {
 	List * splitList;
 	List * currentSubList;
 	List * subString;
-	int currentPosition;
+	List * tmpList;
+	int delimiterLocation;
+	int delimiterLength;
 	int length;
 
 	if(string == NULL || delimiter == NULL)
@@ -174,30 +180,56 @@ List * rString_split(rString * string, rString * delimiter)
 	if(string->characters == NULL || string->characters == NULL)
 		return NULL;
 
-	currentPosition = 0;
-	length = rString_getLength(string);
+	/*Stores the current section of the string we are searching*/
 	currentSubList = List_clone(string->characters);
+
+	delimiterLength = String_getLength(delimiter);
+
 	splitList = List_create();
 
 	if(splitList == NULL)
 		return NULL;
 
-	currentPosition = List_positionOfSubList(currentSubList, delimiter->characters, compareCaseSensitive);
-	while(currentPosition != -1)
-	{
-		int endLocation = currentPosition - 1;
+	delimiterLocation = List_positionOfSubList(currentSubList, delimiter->characters, compareCaseSensitive);
 
-		if(endLocation >= 0)
+	while(delimiterLocation != -1)
+	{
+		int indexAfterDelimiter;
+		int indexBeforeDelimiter = delimiterLocation - 1;
+
+		length = List_getLength(currentSubList);
+
+		/* Have valid string before delimiter */
+		if(indexBeforeDelimiter >= 0)
 		{
-			subString = List_getRange(currentSubList, 0, endLocation);
+			/* Fetch the string before the delimiter */
+			subString = List_getRange(currentSubList, 0, indexBeforeDelimiter);
+			/*Store the found string in our list of split strings*/
 			List_addBack(splitList, stringFromList(subString));
-			List_destroy(currentSubList);
-			currentSubList = List_getRange(currentSubList, currentPosition, List_getLength(currentSubList) - 1);
+			List_destroy(subString);
+
 		}
 
-		currentPosition = List_positionOfSubList(currentSubList, delimiter->characters, compareCaseSensitive);
+		indexAfterDelimiter = delimiterLocation + delimiterLength;
+
+		if(indexAfterDelimiter < (length - 1))
+		{
+			tmpList = List_getRange(currentSubList, indexAfterDelimiter, length - 1);
+			List_destroy(currentSubList);
+			currentSubList = tmpList;
+		}
+		else /* Special Case: String ends with the delimiter */
+		{
+			List_destroy(currentSubList);
+			/* The next sublist is empty because there is no more substring */
+			currentSubList = List_create();
+			break;
+		}
+
+		delimiterLocation = List_positionOfSubList(currentSubList, delimiter->characters, compareCaseSensitive);
 	}
 
+	/* There are no more delimiters, so the rest of the string must be added to the list */
 	if(List_getLength(currentSubList) != 0)
 		List_addBack(splitList, stringFromList(currentSubList));
 
@@ -208,7 +240,7 @@ List * rString_split(rString * string, rString * delimiter)
 
 /* Properties */
 
-int rString_getLength(rString * string)
+int String_getLength(String * string)
 {
 	if(string == NULL)
 		return -1;
@@ -219,9 +251,17 @@ int rString_getLength(rString * string)
 	return List_getLength(string->characters);
 }
 
+int String_indexOf(String * string, String * substring)
+{
+	if(string == NULL || substring == NULL)
+		return -1;
+
+	return List_positionOfSubList(string->characters, substring->characters, compareCaseSensitive);
+}
+
 /* Convertions */
 
-char * rString_c(rString * string)
+char * String_c(String * string)
 {
 	char * cString = NULL;
 	int length;
@@ -235,7 +275,7 @@ char * rString_c(rString * string)
 	if(string->characters == NULL)
 		return NULL;
 
-	length = rString_getLength(string);
+	length = String_getLength(string);
 	if(length < 0)
 		return NULL;
 
@@ -262,8 +302,64 @@ char * rString_c(rString * string)
 	return cString;
 }
 
+String * String_listToString(List * list, String * (*toString)(void *))
+{
+	String * string;
+	String * comma;
+	String * toStringReturn;
+	String * endBracket;
+	ListIterator * iterator;
+	void * data;
+	Boolean first;
+
+	string = String_create("{");
+	comma = String_create(", ");
+
+	iterator = ListIterator_create(list);
+	data = ListIterator_seekToFirst(iterator);
+	first = true;
+
+	while(data != NULL)
+	{
+		if(!first)
+			String_append(string, comma);
+		else
+			first = false;
+
+		toStringReturn = toString(data);
+		if(toStringReturn != NULL)
+		{
+			String_append(string, toStringReturn);
+			String_destroy(toStringReturn);
+		}
+
+		data = ListIterator_nextItem(iterator);
+	}
+
+	String_destroy(comma);
+	endBracket = String_create("}");
+	String_append(string, endBracket);
+	String_destroy(endBracket);
+	ListIterator_destroy(iterator);
+
+	return string;
+
+}
+
 /* Internal Functions */
 /* DO NOT USE */
+
+/*static String * characterListToString(void * ch)
+{
+	String * string = String_createEmpty();
+	String_appendChar(string, *(char*)ch);
+	return string;
+}
+
+static String * voidToString(void * v)
+{
+	return (String *)v;
+}*/
 
 static int cStringLength(char * cStr)
 {
@@ -286,9 +382,9 @@ static int compareCaseSensitive(void * v1, void * v2)
 	return *(char*)v1 == *(char*)v2;
 }
 
-static rString * stringFromList(List * list)
+static String * stringFromList(List * list)
 {
-	rString * string = malloc(sizeof(rString));
+	String * string = malloc(sizeof(String));
 	if(string == NULL)
 		return NULL;
 

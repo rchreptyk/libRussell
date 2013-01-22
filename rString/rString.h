@@ -1,74 +1,111 @@
 #ifndef String_ADT
 #define String_ADT
 
-#include <List.h>
-#include <ctype.h>
-#include <stdlib.h>
+#include "List.h"
+#include "Boolean.h"
 
 /******************************************************************
  * CONSTRUCTORS AND DESTRUCTORS
  ******************************************************************/
 
-struct rStringStruct;
-typedef struct rStringStruct rString;
+struct stringStruct;
+typedef struct stringStruct String;
 
-rString * rString_create(char *);
+String * String_create(char *);
 
-rString * rString_createEmpty();
+String * String_createEmpty();
 
-Boolean rString_destroy(rString *);
+Boolean String_destroy(String *);
 
 /*******************************************************************
  * OPERATIONS
  ******************************************************************/
 
-rString * rString_copy(rString *);
+String * String_copy(String *);
 
-Boolean rString_append(rString *, rString *);
+/* Adding */
 
-Boolean rString_appendChar(rString *, char);
+Boolean String_append(String *, String *);
 
-rString * rString_concat(rString *, rString *);
+Boolean String_appendChar(String *, char);
 
-List * rString_split(rString *, rString *);
+/* Multi String */
 
-rString * rString_join();
+String * String_concat(String *, String *);
 
-List * rString_contains(rString *, rString *);
+List * String_split(String *, String *);
 
-rString * rString_toLowerCase(rString *);
+String * String_join(List *, String *);
 
-rString * rString_toUpperCase(rString *);
+/* String Mutations */
 
-rString * rString_trim(rString *);
+String * String_toLowerCase(String *);
+
+String * String_toUpperCase(String *);
+
+String * String_trim(String *);
+
+String * String_stripSpace(String *);
+
+String * String_stripChars(String *, List *);
+
+String * String_stripNonAlpha(String *);
+
+String * String_stripNonNumeric(String *);
+
+String * String_stripNonAlphaNumeric(String *);
+
+String * String_stripMatching(String *, int isEqual(char *));
+
+String * String_replace(String *, String *);
 
 /*******************************************************************
 * COMPARISIONS
 ******************************************************************/
 
-Boolean rString_equals(rString *, rString *);
+Boolean String_equals(String *, String *);
 
-Boolean rString_equalsIgnoreCase(rString *, rString *);
+Boolean String_equalsIgnoreCase(String *, String *);
 
 /*******************************************************************
 * PROPERTIES
 ******************************************************************/
 
-int rString_getLength(rString *);
+int String_getLength(String *);
 
-int rString_indexOf(rString *, rString *);
+int String_indexOf(String *, String *);
 
-char rString_charAt(rString *, int);
+char String_charAt(String *, int);
+
+Boolean String_contains(String *, List *);
+
+Boolean String_containsNonAlpha(String *);
+
+Boolean String_containsNonDigits(String *);
+
+Boolean String_containsChars(String *, List *);
+
+Boolean String_containsNonAlpha(String *);
+
+Boolean String_containsNonNumeric(String *);
+
+Boolean String_containsNonAlphaNumeric(String *);
+
+Boolean String_containsSpace(String *);
 
 /*******************************************************************
 * COVERTIONS
 ******************************************************************/
 
-char * rString_c(rString *);
+char * String_c(String *);
 
-int rString_convertInt(rString *);
+int String_convertInt(String *);
 
-double rString_convertDouble(rString *);
+double String_convertDouble(String *);
+
+String * String_listToString(List *, String * (*toString)(void *));
+
+List * String_toCharList(String *);
 
 #endif
 

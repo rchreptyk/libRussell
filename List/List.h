@@ -17,12 +17,11 @@ through a list given it's operations
  ******************************************************/
 
 
-#ifndef List_ADT_Included
-#define List_ADT_Included
+#ifndef List_ADT
+#define List_ADT
 
 #include "Boolean.h":
 #include <stdlib.h>
-#include <rString.h>
 
 struct listStruct;
 /* The List object defintion */
