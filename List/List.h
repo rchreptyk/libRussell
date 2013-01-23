@@ -241,6 +241,7 @@ Postconditions: The value of the item stored in the specified position is return
  ******************************************************************************************/
 
 int List_getLength(List *); /*
+******************************
 Returns the number of items stored in a given list.
 
 Parameters:
@@ -255,6 +256,7 @@ Postconditions: The number of items in the list will be returned.
 */
 
 Boolean List_isEmpty(List *); /*
+********************************
 Returns whether the list is empty or not.
 
 Parameters:
@@ -275,7 +277,7 @@ the list contains items.
  ******************************************************************************************/
 
 Boolean List_containsMatchedData(List *, void *, int (*isEqual) (void *, void *)); /*
-*********************************************************************************
+*************************************************************************************
 Returns whether list contains data which is considered equal to the void reference
 given by the isEqual function given. This effectivily allows you to determine if 
 any reference in the list as specified by the isEqual function.
@@ -346,6 +348,45 @@ Preconditions: An initilized List, a non NULL void pointer, a valid function poi
 which returns 0 on inequality, and 1 on equality of passed elements.
 Postconditions: If the data is found, it is removed from the list and it's data
 reference is returned. NULL is returned if the data is not found.
+
+*/
+
+Boolean List_containsInvalidData(List *, int (*isValid) (void *)); /*
+*********************************************************************************
+Like List_containsMatchedData this function searching through a list of data. However
+this function returns true whenever data is found that the isValid function determines
+not to be a match. This allows you to check a List for invalid data.
+
+Parameters:
+List * - The list which you are searching for invalid data
+int (*isValid) (void *) - This function must recieve a piece of data and declare
+whether the data is valid or not.
+
+Return Value:
+Boolean - returns true if data is not valid based off of the isValid function
+
+Preconditions: An initilized List, a non NULL void pointer, a valid function pointers
+which validates data and returns 1 on valid data and 0 on invalid data
+Postconditions: true is returned if invalid data is found, false if it is not
+
+*/
+
+Boolean List_containsValidData(List *, int (*isValid) (void *)); /*
+*********************************************************************************
+Like List_containsInvalidData this function searching through a list of data. However
+this function returns true whenever data is found to be valid in the list.
+
+Parameters:
+List * - The list which you are searching for valid data
+int (*isValid) (void *) - This function must recieve a piece of data and declare
+whether the data is valid or not.
+
+Return Value:
+Boolean - returns true if data is not valid based off of the isValid function
+
+Preconditions: An initilized List, a non NULL void pointer, a valid function pointers
+which validates data and returns 1 on valid data and 0 on invalid data
+Postconditions: true is returned if valid data is found, false if it is not
 
 */
 

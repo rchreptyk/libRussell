@@ -334,6 +334,44 @@ void * List_removeMatchedData(List * list, void * data, int (*isEqual) (void *, 
     return List_removePosition(list, List_matchedDataPosition(list, data, isEqual));
 }
 
+Boolean List_containsInvalidData(List * list, int (*isValid) (void *))
+{
+    ListNode * currentNode;
+    
+    if(list == NULL)
+        return true;
+    
+    currentNode = list->firstNode;
+    while(currentNode != NULL)
+    {
+        if(!isValid(currentNode->data))
+            return true;
+        
+        currentNode = currentNode->nextNode;
+    }
+    
+    return false;
+}
+
+Boolean List_containsValidData(List * list, int (*isValid) (void *))
+{
+    ListNode * currentNode;
+    
+    if(list == NULL)
+        return true;
+    
+    currentNode = list->firstNode;
+    while(currentNode != NULL)
+    {
+        if(isValid(currentNode->data))
+            return true;
+        
+        currentNode = currentNode->nextNode;
+    }
+    
+    return false;
+}
+
 /* Interators */
 
 ListIterator * ListIterator_create(List * list)
@@ -529,6 +567,7 @@ Boolean ListIterator_insertValue(ListIterator * iterator, void * data)
     newNode->previousNode = previousNode;
 
     iterator->currentNode = newNode;
+    iterator->list->length++;
 
     return true;
 
