@@ -3,28 +3,20 @@
 
 int main()
 {
-	String * string, *del, *tmpString;
-	List * result;
-	ListIterator * iterator;
+	String * string;
 
-	string = String_create("Russell&Melissa&Sex");
-	del = String_create("&");
+	string = String_create("3242.34234");
 
-	result = String_split(string, del);
-	iterator = ListIterator_create(result);
-	tmpString = ListIterator_removeCurrent(iterator);
-
-	while(tmpString != NULL)
+	if(String_containsNonNumeric(string))
 	{
-		printf("%s\n", String_c(tmpString));
-		String_destroy(tmpString);
-		tmpString = ListIterator_removeCurrent(iterator);
+		printf("Yes\n");
+	}
+	else
+	{
+		printf("No\n");
 	}
 
-	List_destroy(result);
-	ListIterator_destroy(iterator);
 	String_destroy(string);
-	String_destroy(del);
 
 	return 0;
 }
