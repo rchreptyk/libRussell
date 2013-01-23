@@ -882,6 +882,31 @@ is returned. -1 is returned if the list is not found
 
 */
 
+int List_positionOfSubListOffset(List *, List *, int (*isEqual)(void *, void*), int offset); /*
+Returns the position of the second list in the first list. If the list is
+not found, -1 is returned. This preforms the same as List_positionOfSubList however it
+will only start searching for the sublist after the offset
+
+List * - The list to be checked for a sublist
+List * - The sublist that is being looked for in the first list
+int (*isEqual)(void*, void*) - A function to determine if a value is the same
+as a value we are searching for. Given to pieces of data, this function should
+return 1 if they are determined to be the equal. 0 Should be returned if they
+are determined to not be equal.
+int - The location to start looking at the list from. This must be between 0
+and one less then the list
+
+Return Value:
+int - Returns the position of the second list in the first list after the offset. -1 is
+returned if the list is not found or an error occured.
+
+Preconditions: Two initilized lists, and a equal function which returns 1
+if the both references are equal or 0 if not and a valid valid offset.
+Postconditions: The position of the second list within the first list
+is returned. -1 is returned if the list is not found
+
+*/
+
 Boolean List_isEqual(List *, List *, int (*isEqual)(void *, void *)); /*
 Returns whether the first list is equal to the second list as
 determined by the isEqual function passed in.

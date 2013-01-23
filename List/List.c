@@ -979,6 +979,11 @@ Boolean List_containsSubList(List * list, List * sublist, int (*isEqual)(void *,
 
 int List_positionOfSubList(List * list, List * sublist, int (*isEqual)(void *, void*))
 {
+    return List_positionOfSubListOffset(list, sublist, isEqual, 0);
+}
+
+int List_positionOfSubListOffset(List * list, List * sublist, int (*isEqual)(void *, void*), int offset)
+{
     int i;
 
     if(list == NULL || sublist == NULL || isEqual == NULL)
@@ -990,7 +995,10 @@ int List_positionOfSubList(List * list, List * sublist, int (*isEqual)(void *, v
     if(List_getLength(sublist) > List_getLength(list))
         return -1;
 
-    if(List_getLength(list) == List_getLength(sublist))
+    if(offset < 0 || offset >= List_getLength(sublist))
+        return -1;
+
+    if(List_getLength(list) == List_getLength(sublist) && offset == 0)
     {
         if(List_isEqual(list, sublist, isEqual))
             return 0;
@@ -998,7 +1006,7 @@ int List_positionOfSubList(List * list, List * sublist, int (*isEqual)(void *, v
             return -1;
     }
 
-    for(i = 0; i < List_getLength(list) - List_getLength(sublist) + 1; i++)
+    for(i = offset; i < List_getLength(list) - List_getLength(sublist) + 1; i++)
     {
         if(locationContainsSubList(list, sublist, isEqual, i))
             return i;
