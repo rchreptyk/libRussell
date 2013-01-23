@@ -784,6 +784,22 @@ char * String_c(String * string)
 	return cString;
 }
 
+int String_convertInt(String * string)
+{
+	if(string == NULL)
+		return 0;
+
+	return atoi(String_c(string));
+}
+
+double String_convertDouble(String * string)
+{
+	if(string == NULL)
+		return 0;
+
+	return atof(String_c(string));
+}
+
 String * String_listToString(List * list, String * (*toString)(void *))
 {
 	String * string;
