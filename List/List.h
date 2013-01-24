@@ -351,6 +351,31 @@ reference is returned. NULL is returned if the data is not found.
 
 */
 
+void * List_getMatchedData(List *, void *, int (*isEqual) (void *, void *)); /*
+Gets the first data which is determined equal to the given data by the passed
+in isEqual function. This allows you to get a piece of data from the list by 
+searching for it. This function will only get the first piece of data found
+to be a match. To remove all matching elements please see List_getMatchedElements
+
+Parameters:
+List * - The list which you are searching for matched data
+void * - The data or resource you are searching for
+int (*isEqual) (void *, void *) - A function which compares two pieces of data within
+the list. If the data is determined to be equal, it should return 1. If the value is
+determined to not be equal, it should return 0. This function is used to determine
+equality.
+
+Return Value:
+void * - The data reference stored in the list that was found by the isEqual function.
+NULL is returned if the data has not been found or an error occured.
+
+Preconditions: An initilized List, a non NULL void pointer, a valid function pointer
+which returns 0 on inequality, and 1 on equality of passed elements.
+Postconditions: If the data is found, it's data
+reference is returned. NULL is returned if the data is not found.
+
+*/
+
 Boolean List_containsInvalidData(List *, int (*isValid) (void *)); /*
 *********************************************************************************
 Like List_containsMatchedData this function searching through a list of data. However

@@ -76,6 +76,7 @@ Boolean List_destroyListAndData(List * list, void (*destroyData)(void * data))
     
     if(list == NULL)
         return false;
+    destroyData(NULL);
 
     while ((currentNode = detachFront(list)) != NULL) {
         destroyData(currentNode->data);
@@ -332,6 +333,14 @@ void * List_removeMatchedData(List * list, void * data, int (*isEqual) (void *, 
         return NULL;
 
     return List_removePosition(list, List_matchedDataPosition(list, data, isEqual));
+}
+
+void * List_getMatchedData(List * list, void * data, int (*isEqual) (void *, void *))
+{   
+    if(data == NULL || list == NULL)
+        return NULL;
+
+    return List_getValueAtPosition(list, List_matchedDataPosition(list, data, isEqual));
 }
 
 Boolean List_containsInvalidData(List * list, int (*isValid) (void *))
