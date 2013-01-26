@@ -7,7 +7,6 @@ struct stringStruct
 };
 
 static int cStringLength(char *);
-static void * copyCharacter(void * ch);
 
 static int compareCaseSensitive(void * v1, void * v2);
 static int compareCaseInsensitive(void * v1, void * v2);
@@ -51,7 +50,7 @@ String * String_create(char * cStr)
 
 	for(i = 0; i < length; i++)
 	{
-		if(!List_addBack(string->characters, copyCharacter(&cStr[i])))
+		if(!List_addBack(string->characters, String_copyCharacter(&cStr[i])))
 		{
 			String_destroy(string);
 			return NULL;
@@ -106,7 +105,7 @@ String * String_copy(String * string)
 	if(string->characters == NULL)
 		return NULL;
 
-	characters = List_copy(string->characters, copyCharacter);
+	characters = List_copy(string->characters, String_copyCharacter);
 
 	if(characters == NULL)
 		return NULL;
@@ -121,6 +120,11 @@ String * String_copy(String * string)
 	return newString;
 }
 
+void * String_copyVoid(void * string)
+{
+	return (void*)String_copy((String *) string);
+}
+
 Boolean String_append(String * string, String * stringToAppend)
 {
 	List * appendedCharacters, * tmpAppendedCharacters;
@@ -132,7 +136,7 @@ Boolean String_append(String * string, String * stringToAppend)
 	if(tmpAppendedCharacters == NULL)
 		return false;
 
-	appendedCharacters = List_copy(tmpAppendedCharacters, copyCharacter);
+	appendedCharacters = List_copy(tmpAppendedCharacters, String_copyCharacter);
 	List_destroy(tmpAppendedCharacters);
 	if(appendedCharacters == NULL)
 		return false;
@@ -151,7 +155,7 @@ Boolean String_appendChar(String * string, char ch)
 	if(string->characters == NULL)
 		return false;
 
-	return List_addBack(string->characters, copyCharacter(&ch));
+	return List_addBack(string->characters, String_copyCharacter(&ch));
 }
 
 String * String_concat(String * first, String * second)
@@ -541,7 +545,7 @@ String * String_replace(String * string, String * search, String * replace)
 		removed = List_removeRange(newString->characters, replacePosition, replacePosition + String_getLength(search) - 1);
 		List_destroyListAndData(removed, free);
 
-		copy = List_copy(replace->characters, copyCharacter);
+		copy = List_copy(replace->characters, String_copyCharacter);
 		merged = List_insertList(newString->characters, replacePosition, copy);
 
 		List_destroy(newString->characters);
@@ -597,6 +601,25 @@ int String_indexOf(String * string, String * substring)
 		return -1;
 
 	return List_positionOfSubList(string->characters, substring->characters, compareCaseSensitive);
+}
+
+int String_numOccurances(String * string, String * substring)
+{
+	int offset, occurances, position;
+
+	if(string == NULL || substring == NULL)
+		return -1;
+
+	offset = 0;
+	occurances = 0;
+
+	while((position = List_positionOfSubListOffset(string->characters, substring->characters, compareCaseSensitive, offset)) != -1)
+	{
+		occurances++;
+		offset = position + String_getLength(substring);
+	}
+
+	return occurances;
 }
 
 char String_charAt(String * string, int position)
@@ -663,18 +686,43 @@ Boolean String_containsNonAlpha(String * string)
 
 Boolean String_containsNonDigit(String * string)
 {
+	int index;
+	String * negative;
+
 	if(string == NULL)
 		return false;
 
-	return List_containsInvalidData(string->characters, pointerIsDigit);
+	negative = String_create("-");
+
+	index = String_indexOf(string, negative);
+
+	String_destroy(negative);
+
+	return List_containsInvalidData(string->characters, pointerIsDigit) || index > 0;
 }
 
 Boolean String_containsNonNumeric(String * string)
 {
+	Boolean contains = false;
+	String * decimal;
+	String * negative;
+	int index = -1;
+
 	if(string == NULL)
 		return false;
 
-	return List_containsInvalidData(string->characters, pointerIsNumeric);
+	decimal = String_create(".");
+	negative = String_create("-");
+
+	index = String_indexOf(string, negative);
+
+	contains = List_containsInvalidData(string->characters, pointerIsNumeric);
+	contains = String_numOccurances(string, decimal) > 1 || contains;
+	contains = index > 0 || contains;
+	String_destroy(decimal);
+	String_destroy(negative);
+
+	return contains;
 }
 
 Boolean String_containsNonAlphaNumeric(String * string)
@@ -846,6 +894,11 @@ String * String_listToString(List * list, String * (*toString)(void *))
 	return string;
 }
 
+String * String_voidToString(void * v)
+{
+	return (String *)v;
+}
+
 List * String_toCharList(String * string)
 {
 	List * list;
@@ -853,13 +906,15 @@ List * String_toCharList(String * string)
 	if(string == NULL)
 		return NULL;
 
-	list = List_copy(string->characters, copyCharacter);
+	list = List_copy(string->characters, String_copyCharacter);
 	return list;
 }
 
-String * String_voidToString(void * v)
+void * String_copyCharacter(void * ch)
 {
-	return (String *)v;
+	char * newCh = malloc(sizeof(char));
+	*newCh = *(char *)ch;
+	return newCh;
 }
 
 /* Internal Functions */
@@ -908,12 +963,6 @@ static int cStringLength(char * cStr)
 	return i;
 }
 
-static void * copyCharacter(void * ch)
-{
-	char * newCh = malloc(sizeof(char));
-	*newCh = *(char *)ch;
-	return newCh;
-}
 
 static int compareCaseSensitive(void * v1, void * v2)
 {
@@ -950,7 +999,7 @@ static int pointerIsDigit(void * data)
 	if(data == NULL)
 		return false;
 
-	return isdigit(*(char*)data);
+	return isdigit(*(char*)data) || *(char*)data == '-';
 }
 
 static int pointerIsNumeric(void * data)
@@ -958,7 +1007,7 @@ static int pointerIsNumeric(void * data)
 	if(data == NULL)
 		return false;
 
-	return isdigit(*(char*)data) || *(char*)data == '.';
+	return isdigit(*(char*)data) || *(char*)data == '.' || *(char*)data == '-';
 }
 
 static int pointerIsAlphaNumeric(void * data)
@@ -975,7 +1024,7 @@ static String * stringFromList(List * list)
 	if(string == NULL)
 		return NULL;
 
-	string->characters = List_copy(list, copyCharacter);
+	string->characters = List_copy(list, String_copyCharacter);
 	string->cString = NULL;
 	return string;
 }

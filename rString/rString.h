@@ -26,6 +26,8 @@ void String_destroyVoidString(void *);
 
 String * String_copy(String *);
 
+void * String_copyVoid(void *);
+
 /* Adding */
 
 Boolean String_append(String *, String *);
@@ -86,6 +88,8 @@ int String_getLength(String *);
 
 int String_indexOf(String *, String *);
 
+int String_numOccurances(String *, String *);
+
 char String_charAt(String *, int);
 
 Boolean String_containsSpace(String *);
@@ -116,9 +120,15 @@ double String_convertDouble(String *);
 
 String * String_listToString(List *, String * (*toString)(void *));
 
+String * String_voidToString(void * v);
+
+/*******************************************************************
+* CHARACTER LISTS
+******************************************************************/
+
 List * String_toCharList(String *);
 
-String * String_voidToString(void * v);
+void * String_copyCharacter(void * ch);
 
 #endif
 
