@@ -154,7 +154,7 @@ Boolean List_insertAtPosition(List * list, void * data, int index)
 {
     ListNode * nextNode, *previousNode, *newNode;
     
-    if(list == NULL || newNode == NULL)
+    if(list == NULL || data == NULL)
         return false;
     
     if(index < 0 || index > List_getLength(list))
@@ -1120,6 +1120,7 @@ static Boolean locationContainsSubList(List * list, List * sublist, int (isEqual
 
     while(data != NULL && searchData != NULL && isEqual(data, searchData))
     {
+
         data = ListIterator_nextItem(iterator);
         searchData = ListIterator_nextItem(subIterator);
     }
