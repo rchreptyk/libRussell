@@ -18,7 +18,7 @@ KeyValuePair * KeyValuePair_create(String * key)
 	if(pair == NULL)
 		return NULL;
 
-	pair->key = String_toLowerCase(key);
+	pair->key = String_copy(key);
 	pair->value = NULL;
 
 	return pair;
