@@ -39,5 +39,7 @@ KeyValuePair.o : HashTable/KeyValuePair.c HashTable/KeyValuePair.h
 HashFunctions.o : HashTable/HashFunctions.c HashTable/HashFunctions.h
 	gcc $(CFLAGS) -IrString -IList -IHashTable -c HashTable/HashFunctions.c
 
+
+
 clean:
 	@ rm *.o
