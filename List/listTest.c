@@ -31,4 +31,6 @@ int main()
 
 	List_destroyListAndData(list, free);
 	List_destroyListAndData(list2, free);
+
+	return 0;
 }
