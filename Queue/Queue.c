@@ -3,7 +3,7 @@
 
 struct queueStruct {
 	List * list;
-}
+};
 
 Queue * Queue_create()
 {
@@ -47,5 +47,10 @@ void * Queue_dequeue(Queue * queue)
 
 void * Queue_peek(Queue * queue)
 {
-	return List_getValueOfFront(queue->list);
+	return List_getFirstValue(queue->list);
+}
+
+int Queue_getLength(Queue * queue)
+{
+	return List_getLength(queue->list);
 }

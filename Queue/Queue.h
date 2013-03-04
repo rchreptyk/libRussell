@@ -2,6 +2,8 @@
 Queue
  */
 
+#include "Boolean.h"
+
 #ifndef Queue_ADT
 #define Queue_ADT
 
@@ -27,5 +29,11 @@ Boolean Queue_enqueue(Queue *, void *);
 void * Queue_dequeue(Queue *);
 
 void * Queue_peek(Queue *);
+
+/*******************************************************************************************
+ PROPERTIES
+ ******************************************************************************************/
+
+int Queue_getLength(Queue * queue);
 
 #endif
