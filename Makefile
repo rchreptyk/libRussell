@@ -1,45 +1,108 @@
 CC          =	gcc
 # Flags that are sent to the compiler
 # Do not change these
-CFLAGS      =	-g3 -Wall -ansi -pedantic
+CFLAGS      =	-g3 -Wall -ansi
 LDFLAGS     =
 
-all: listTest rStringTest hashTableTest
+REQLIST = -I List
+LISTOBJ = obj/lib/List.o
 
-listTest : List.o listTest.o
-	gcc List.o listTest.o -o listTest
+REQSTR = -IrString
+STROBJ = $(LISTOBJ) obj/lib/rString.o
 
-List.o : List/List.c List/List.h
-	gcc $(CFLAGS) -I List -c List/List.c
+REQHASH = -IHashTable
+HASHOBJ = $(STROBJ) obj/lib/HashTable.o obj/lib/KeyValuePair.o obj/lib/HashFunctions.o
 
-listTest.o : List/listTest.c
-	gcc $(CFLAGS) -c -I List List/listTest.c
+REQQUE = -IQueue
+QUEOBJ = $(LISTOBJ) obj/lib/Queue.o
 
-rStringTest : rString.o rStringTest.o List.o
-	gcc rString.o rStringTest.o List.o -o rStringTest
+REQTREE = -IAVLTree
+TREEOBJ = obj/lib/AVLTree.o
 
-rString.o : rString/rString.c rString/rString.h
-	gcc $(CFLAGS) -IList -IrString -c rString/rString.c
+REQPQUE = $(REQTREE) -I PriorityQueue
+PQUEOBJ = $(TREEOBJ) obj/lib/PriorityQueue.o
 
-rStringTest.o : rString/rStringTest.c
-	gcc $(CFLAGS) -IrString -IList -c rString/rStringTest.c
+all: bin/listTest bin/rStringTest bin/hashTableTest bin/queueTest bin/avlTreeTest  bin/priorityQueueTest
 
-hashTableTest :  List.o rString.o HashTable.o KeyValuePair.o hashTableTest.o HashFunctions.o
-	gcc hashTableTest.o HashTable.o List.o rString.o KeyValuePair.o HashFunctions.o -o hashTableTest
+listTest : bin/listTest
+rStringTest : bin/rStringTest
+hashTableTest : bin/hashTableTest
+listTest : bin/listTest
 
-hashTableTest.o : HashTable/hashTableTest.c
-	gcc $(CFLAGS) -IHashTable -IrString -IList -c HashTable/hashTableTest.c
 
-HashTable.o : HashTable/HashTable.c HashTable/HashTable.h
-	gcc $(CFLAGS) -IrString -IList -IHashTable -c HashTable/HashTable.c
+# List
 
-KeyValuePair.o : HashTable/KeyValuePair.c HashTable/KeyValuePair.h
-	gcc $(CFLAGS) -IrString -IList -IHashTable -c HashTable/KeyValuePair.c
+bin/listTest: $(LISTOBJ) obj/test/listTest.o
+	gcc $^ -o $@
 
-HashFunctions.o : HashTable/HashFunctions.c HashTable/HashFunctions.h
-	gcc $(CFLAGS) -IrString -IList -IHashTable -c HashTable/HashFunctions.c
+obj/lib/List.o: List/List.c List/List.h
+	gcc $(CFLAGS) $(REQLIST) -c List/List.c -o $@
 
+obj/test/listTest.o: List/listTest.c
+	gcc $(CFLAGS) $(REQLIST) -c List/listTest.c -o $@
+
+# String
+
+bin/rStringTest: $(STROBJ) obj/test/rStringTest.o
+	gcc $^ -o $@
+
+obj/lib/rString.o: rString/rString.c rString/rString.h
+	gcc $(CFLAGS) $(REQLIST) $(REQSTR) -c rString/rString.c -o $@
+
+obj/test/rStringTest.o: rString/rStringTest.c
+	gcc $(CFLAGS) $(REQLIST) $(REQSTR) -c $^ -o $@
+
+# Hash
+
+bin/hashTableTest: $(HASHOBJ) obj/test/hashTableTest.o
+	gcc $^ -o $@
+
+obj/test/hashTableTest.o: HashTable/hashTableTest.c
+	gcc $(CFLAGS) $(REQLIST) $(REQSTR) $(REQHASH) -c HashTable/hashTableTest.c -o $@
+
+obj/lib/HashTable.o: HashTable/HashTable.c HashTable/HashTable.h
+	gcc $(CFLAGS) $(REQLIST) $(REQSTR) $(REQHASH) -c HashTable/HashTable.c -o $@
+
+obj/lib/KeyValuePair.o: HashTable/KeyValuePair.c HashTable/KeyValuePair.h
+	gcc $(CFLAGS) $(REQLIST) $(REQSTR) $(REQHASH) -c HashTable/KeyValuePair.c -o $@
+
+obj/lib/HashFunctions.o: HashTable/HashFunctions.c HashTable/HashFunctions.h
+	gcc $(CFLAGS) $(REQLIST) $(REQSTR) $(REQHASH) -c HashTable/HashFunctions.c -o $@
+
+# Queue
+
+bin/queueTest: $(QUEOBJ) obj/test/queueTest.o
+	gcc $^ -o $@
+
+obj/test/queueTest.o: Queue/queueTest.c
+	gcc $(CFLAGS) $(REQLIST) $(REQQUE) -c Queue/queueTest.c -o $@
+
+obj/lib/Queue.o: Queue/Queue.c Queue/Queue.h
+	gcc $(CFLAGS) $(REQLIST) $(REQQUE) -c Queue/Queue.c -o $@
+
+#AVL Tree
+
+bin/avlTreeTest: $(TREEOBJ) obj/test/avlTreeTest.o
+	gcc $^ -o $@
+
+obj/test/avlTreeTest.o: AVLTree/treeTest.c
+	gcc $(CFLAGS) $(REQLIST) $(REQTREE) -c AVLTree/treeTest.c -o $@
+
+obj/lib/AVLTree.o: AVLTree/AVLTree.c AVLTree/AVLTree.h
+	gcc $(CFLAGS) $(REQLIST) $(REQTREE) -c AVLTree/AVLTree.c -o $@
+
+#Priority Queue
+
+bin/priorityQueueTest: $(PQUEOBJ) obj/test/priorityQueueTest.o
+	gcc $^ -o $@
+
+obj/test/priorityQueueTest.o: PriorityQueue/priTest.c
+	gcc $(CFLAGS) $(REQLIST) $(REQTREE) $(REQPQUE) -c PriorityQueue/priTest.c -o $@
+
+obj/lib/PriorityQueue.o: PriorityQueue/PriorityQueue.c PriorityQueue/PriorityQueue.h
+	gcc $(CFLAGS) $(REQLIST) $(REQTREE) $(REQPQUE) -c PriorityQueue/PriorityQueue.c -o $@
 
 
 clean:
-	@ rm *.o
+	@ rm -f bin/*
+	@ rm -f obj/*/*.o
