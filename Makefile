@@ -4,8 +4,6 @@ CC          =	gcc
 CFLAGS      =	-g3 -Wall -ansi
 LDFLAGS     =
 
-Bla BLa bLAsdasdasd 
-
 REQLIST = -I List
 LISTOBJ = obj/lib/List.o
 
@@ -25,6 +23,7 @@ REQPQUE = $(REQTREE) -I PriorityQueue
 PQUEOBJ = $(TREEOBJ) obj/lib/PriorityQueue.o
 
 all: bin/listTest bin/rStringTest bin/hashTableTest bin/queueTest bin/avlTreeTest  bin/priorityQueueTest
+
 
 listTest : bin/listTest
 rStringTest : bin/rStringTest
@@ -103,6 +102,17 @@ obj/test/priorityQueueTest.o: PriorityQueue/priTest.c
 
 obj/lib/PriorityQueue.o: PriorityQueue/PriorityQueue.c PriorityQueue/PriorityQueue.h
 	gcc $(CFLAGS) $(REQLIST) $(REQTREE) $(REQPQUE) -c PriorityQueue/PriorityQueue.c -o $@
+
+#Stream
+
+bin/streamTest: $(STMPOBJ) obj/test/streamTest.o
+	gcc $^ -o $@
+
+obj/test/streamTest.o: Stream/streamTest.c
+	gcc $(CFLAGS) $(REQSTR) $(REQSTMP) $(REQLIST) -c Stream/streamTest.c -o $@
+
+obj/lib/Stream.o: Stream/Stream.c Stream/Stream.h
+	gcc $(CFLAGS) $(REQSTR) $(REQSTMP) $(REQLIST) -c Stream/Stream.c -o $@
 
 
 clean:
