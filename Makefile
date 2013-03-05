@@ -4,6 +4,8 @@ CC          =	gcc
 CFLAGS      =	-g3 -Wall -ansi
 LDFLAGS     =
 
+Bla BLa bLAsdasdasd 
+
 REQLIST = -I List
 LISTOBJ = obj/lib/List.o
 
