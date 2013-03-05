@@ -147,6 +147,23 @@ Boolean String_append(String * string, String * stringToAppend)
 	return true;
 }
 
+Boolean String_SappendC(String * string, char * string2)
+{
+	if(string == NULL || string2 == NULL)
+		return false;
+
+	String * second = String_create(string2);
+
+	if(second == NULL)
+		return false;
+
+	Boolean success = String_append(string, second);
+
+	String_destroy(second);
+
+	return success;
+}
+
 Boolean String_appendChar(String * string, char ch)
 {
 	if(string == NULL)
@@ -180,6 +197,38 @@ String * String_concat(String * first, String * second)
 		return NULL;
 
 	return newString;
+}
+
+String * String_SconcatC(String * first, char * string)
+{
+	if(first == NULL || string == NULL)
+		return NULL;
+
+	String * second = String_create(string);
+	if(second == NULL)
+		return NULL;
+
+	String * lastString = String_concat(first, second);
+
+	String_destroy(second);
+
+	return lastString;
+}
+
+String * String_CconcatS(char * first, String * second)
+{
+	if(first == NULL || second == NULL)
+		return NULL;
+
+	String * firstString = String_create(first);
+	if(firstString == NULL)
+		return NULL;
+
+	String * result = String_concat(firstString, second);
+
+	String_destroy(firstString);
+
+	return result;
 }
 
 List * String_split(String * string, String * delimiter)
@@ -256,6 +305,20 @@ List * String_split(String * string, String * delimiter)
 	return splitList;
 }
 
+List * String_SsplitC(String * string, char * delimiter)
+{
+	if(string == NULL || delimiter == NULL)
+		return NULL;
+
+	String * del = String_create(delimiter);
+
+	List * list = String_split(string, del);
+
+	String_destroy(del);
+
+	return list;
+}
+
 String * String_join(List * stringList, String * del)
 {
 	String * currentString;
@@ -293,6 +356,20 @@ String * String_join(List * stringList, String * del)
 	ListIterator_destroy(iterator);
 
 	return newString;
+}
+
+String * String_SjoinC(List * stringList, char * del)
+{
+	if(stringList == NULL || del == NULL)
+		return NULL;
+
+	String * delimiter = String_create(del);
+
+	String * result = String_join(stringList, delimiter);
+
+	String_destroy(delimiter);
+
+	return result;
 }
 
 String * String_toLowerCase(String * string)
@@ -558,6 +635,59 @@ String * String_replace(String * string, String * search, String * replace)
 	return newString;
 }
 
+String * String_CreplaceC(String * string, char * search, char * replace)
+{
+	if(string == NULL || replace == NULL || search == NULL)
+		return NULL;
+
+	String * searchS = String_create(search);
+	if(searchS == NULL)
+		return NULL;
+
+	String * replaceS = String_create(replace);
+	if(replaceS == NULL)
+		return NULL;
+
+	String * result = String_replace(string, searchS, replaceS);
+
+	String_destroy(searchS);
+	String_destroy(replaceS);
+
+	return result;
+}
+
+String * String_SreplaceC(String * string, String * search, char * replace)
+{
+	if(string == NULL || replace == NULL || search == NULL)
+		return NULL;
+
+	String * replaceS = String_create(replace);
+	if(replaceS == NULL)
+		return NULL;
+
+	String * result = String_replace(string, search, replaceS);
+
+	String_destroy(replaceS);
+
+	return result;
+}
+
+String * String_CreplaceS(String * string, char * search, String * replace)
+{
+	if(string == NULL || replace == NULL || search == NULL)
+		return NULL;
+
+	String * searchS = String_create(search);
+	if(searchS == NULL)
+		return NULL;
+
+	String * result = String_replace(string, searchS, replace);
+
+	String_destroy(searchS);
+
+	return result;
+}
+
 /* Comparisions */
 
 Boolean String_equals(String * string, String * string2)
@@ -571,6 +701,23 @@ Boolean String_equals(String * string, String * string2)
 	return List_isEqual(string->characters, string2->characters, compareCaseSensitive);
 }
 
+Boolean String_SequalsC(String * string, char * string2)
+{
+	if(string == NULL && string2 == NULL)
+		return true;
+
+	if(string == NULL || string2 == NULL)
+		return false;
+
+	String * string2S = String_create(string2);
+
+	Boolean result = String_equals(string, string2S);
+
+	String_destroy(string2S);
+
+	return result;
+}
+
 Boolean String_equalsIgnoreCase(String * string, String * string2)
 {
 	if(string == NULL && string == NULL)
@@ -580,6 +727,23 @@ Boolean String_equalsIgnoreCase(String * string, String * string2)
 		return false;
 
 	return List_isEqual(string->characters, string2->characters, compareCaseInsensitive);
+}
+
+Boolean String_SequalsIgnoreCaseC(String * string, char * string2)
+{
+	if(string == NULL && string2 == NULL)
+		return true;
+
+	if(string == NULL || string2 == NULL)
+		return false;
+
+	String * string2S = String_create(string2);
+
+	Boolean result = String_equalsIgnoreCase(string, string2S);
+
+	String_destroy(string2S);
+
+	return result;
 }
 
 /* Properties */

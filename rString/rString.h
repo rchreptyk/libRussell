@@ -32,13 +32,21 @@ void * String_copyVoid(void *);
 
 Boolean String_append(String *, String *);
 
+Boolean String_SappendC(String * string, char * string2);
+
 Boolean String_appendChar(String *, char);
 
 /* Multi String */
 
 String * String_concat(String *, String *);
 
+String * String_SconcatC(String * first, char * string);
+
+String * String_CconcatS(char * first, String * second);
+
 List * String_split(String *, String *);
+
+List * String_SsplitC(String * string, char * delimiter);
 
 String * String_join(List *, String *);
 
@@ -72,13 +80,23 @@ String * String_stripNotMatching(String * string, int (*isEqual)(int));
 
 String * String_replace(String *, String *, String *);
 
+String * String_CreplaceC(String * string, char * search, char * replace);
+
+String * String_SreplaceC(String * string, String * search, char * replace);
+
+String * String_CreplaceS(String * string, char * search, String * replace);
+
 /*******************************************************************
 * COMPARISIONS
 ******************************************************************/
 
 Boolean String_equals(String *, String *);
 
+Boolean String_SequalsC(String * string, char * string2);
+
 Boolean String_equalsIgnoreCase(String *, String *);
+
+Boolean String_SequalsIgnoreCaseC(String * string, char * string2);
 
 /*******************************************************************
 * PROPERTIES
