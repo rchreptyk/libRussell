@@ -199,6 +199,9 @@ void * List_removeFront(List * list)
         return false;
     
     nodeToRemove = detachFront(list);
+    if(nodeToRemove == NULL)
+        return NULL;
+
     data = nodeToRemove->data;
     destroyNode(nodeToRemove);
     return data;
@@ -213,6 +216,9 @@ void * List_removeBack(List * list)
         return NULL;
     
     nodeToRemove = detachBack(list);
+    if(nodeToRemove == NULL)
+        return NULL;
+
     data = nodeToRemove->data;
     destroyNode(nodeToRemove);
     return data;
@@ -230,6 +236,9 @@ void * List_removePosition(List * list, int index)
         return NULL;
     
     nodeToRemove = detachAtIndex(list, index);
+    if(nodeToRemove == NULL)
+        return NULL;
+
     data = nodeToRemove->data;
     destroyNode(nodeToRemove);
     return data;
