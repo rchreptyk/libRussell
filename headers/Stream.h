@@ -30,9 +30,11 @@ String * Stream_nextLine(Stream * stream);
 
 int Stream_nextInt(Stream * stream, Boolean * error); 
 
-double Stream_nextDouble(Stream * stream, Boolean * error);
-
 /* Writing */
+
+// Boolean Stream_writeLine(Stream * stream, String * line);
+
+// Boolean Stream_write(Stream * stream, String * string);
 
 /* Properties */
 

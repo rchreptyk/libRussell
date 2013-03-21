@@ -194,6 +194,20 @@ int Stream_nextInt(Stream * stream, Boolean * error)
 	return realInt;
 }
 
+// Boolean Stream_writeLine(String * stream, String * line)
+// {
+// 	if(stream == NULL || line == NULL)
+// 		return false;
+
+
+// }
+
+// Boolean Stream_write(Stream * stream, String * string)
+// {
+// 	if(stream == NULL || string == NULL)
+// 		return false;
+// }
+
 Boolean Stream_fileExists(String * filename)
 {
 	if(filename == NULL)
