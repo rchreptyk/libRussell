@@ -1,2 +1,7 @@
 *.o
 *.dSYM
+.DS_Store
+bin/*
+headers/*
+libRussell.a
+*sublime*
