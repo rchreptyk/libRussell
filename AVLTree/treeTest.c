@@ -8,7 +8,6 @@ int compareInt(void * data, void * data2)
 
 int main()
 {
-	int printOut = 0;
 
 	AVLTree * tree = AVLTree_create(compareInt);
 
