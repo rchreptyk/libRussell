@@ -24,100 +24,139 @@ TREEOBJ = obj/lib/AVLTree.o
 REQPQUE = $(REQTREE) -I PriorityQueue
 PQUEOBJ = $(TREEOBJ) obj/lib/PriorityQueue.o
 
-all: bin/listTest bin/rStringTest bin/hashTableTest bin/queueTest bin/avlTreeTest bin/priorityQueueTest
-deploy: clean all
-	find . -name *.h -exec cp {} headers \;
-	ar r libRussell.a obj/lib/*
+STMPOBJ = $(STROBJ) obj/lib/Stream.o
+REQSTMP = -IStream
+
+all: libs tests
+libs: $(LISTOBJ) $(STROBJ) $(HASHOBJ) $(QUEOBJ) $(TREEOBJ) $(PQUEOBJ) $(STMPOBJ)
+tests: bin/listTest bin/rStringTest bin/hashTableTest bin/queueTest bin/avlTreeTest bin/priorityQueueTest bin/streamTest 
+
+
+deploy: clean libs
+	@ echo Deploying Libraries...
+	@ echo Copying headers to headers folder
+	@ find . -path ./headers -prune -o -name *.h -exec cp {} headers \;
+	@ ar r libRussell.a obj/lib/*
+	@ echo Created libRussell.a static library
+	@ echo
+	@ echo include items headers/ to use library elements
+	@ echo link your code with libRussell.a
+	@ echo
 
 listTest : bin/listTest
 rStringTest : bin/rStringTest
 hashTableTest : bin/hashTableTest
 listTest : bin/listTest
 
+
 # List
 
 bin/listTest: $(LISTOBJ) obj/test/listTest.o
-	gcc $^ -o $@
+	@ echo Linking List Test
+	@ gcc $^ -o $@
 
 obj/lib/List.o: List/List.c List/List.h
-	gcc $(CFLAGS) $(REQBOOL) $(REQLIST) -c List/List.c -o $@
+	@ echo Compiling List Library
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQLIST) -c List/List.c -o $@
 
 obj/test/listTest.o: List/listTest.c
-	gcc $(CFLAGS) $(REQBOOL) $(REQLIST) -c List/listTest.c -o $@
+	@ echo Compiling List Test
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQLIST) -c List/listTest.c -o $@
 
 # String
 
 bin/rStringTest: $(STROBJ) obj/test/rStringTest.o
-	gcc $^ -o $@
+	@ echo Linking String Test
+	@ gcc $^ -o $@
 
 obj/lib/rString.o: rString/rString.c rString/rString.h
-	gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQSTR) -c rString/rString.c -o $@
+	@ echo Compiling String Library
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQSTR) -c rString/rString.c -o $@
 
 obj/test/rStringTest.o: rString/rStringTest.c
-	gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQSTR) -c $^ -o $@
+	@ echo Compiling String Test
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQSTR) -c $^ -o $@
 
 # Hash
 
 bin/hashTableTest: $(HASHOBJ) obj/test/hashTableTest.o
-	gcc $^ -o $@
+	@ echo Linking HashTable Test
+	@ gcc $^ -o $@
 
 obj/test/hashTableTest.o: HashTable/hashTableTest.c
-	gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQSTR) $(REQHASH) -c HashTable/hashTableTest.c -o $@
+	@ echo Compiling HashTable Test
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQSTR) $(REQHASH) -c HashTable/hashTableTest.c -o $@
 
 obj/lib/HashTable.o: HashTable/HashTable.c HashTable/HashTable.h
-	gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQSTR) $(REQHASH) -c HashTable/HashTable.c -o $@
+	@ echo Compiling HashTable Library
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQSTR) $(REQHASH) -c HashTable/HashTable.c -o $@
 
 obj/lib/KeyValuePair.o: HashTable/KeyValuePair.c HashTable/KeyValuePair.h
-	gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQSTR) $(REQHASH) -c HashTable/KeyValuePair.c -o $@
+	@ echo Compiling KeyValuePair Library
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQSTR) $(REQHASH) -c HashTable/KeyValuePair.c -o $@
 
 obj/lib/HashFunctions.o: HashTable/HashFunctions.c HashTable/HashFunctions.h
-	gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQSTR) $(REQHASH) -c HashTable/HashFunctions.c -o $@
+	@ echo Compiling Hash Functions
+	@gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQSTR) $(REQHASH) -c HashTable/HashFunctions.c -o $@
 
 # Queue
 
 bin/queueTest: $(QUEOBJ) obj/test/queueTest.o
-	gcc $^ -o $@
+	@ echo Link Queue Test
+	@ gcc $^ -o $@
 
 obj/test/queueTest.o: Queue/queueTest.c
-	gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQQUE) -c Queue/queueTest.c -o $@
+	@ echo Compiling Queue Test
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQQUE) -c Queue/queueTest.c -o $@
 
 obj/lib/Queue.o: Queue/Queue.c Queue/Queue.h
-	gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQQUE) -c Queue/Queue.c -o $@
+	@ echo Compiling Queue Library
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQQUE) -c Queue/Queue.c -o $@
 
 #AVL Tree
 
 bin/avlTreeTest: $(TREEOBJ) obj/test/avlTreeTest.o
-	gcc $^ -o $@
+	@ echo Linking AVL Tree Test
+	@ gcc $^ -o $@
 
 obj/test/avlTreeTest.o: AVLTree/treeTest.c
-	gcc $(CFLAGS) $(REQBOOL) $(REQTREE) -c AVLTree/treeTest.c -o $@
+	@ echo Compiling AVL Tree Test
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQTREE) -c AVLTree/treeTest.c -o $@
 
 obj/lib/AVLTree.o: AVLTree/AVLTree.c AVLTree/AVLTree.h
-	gcc $(CFLAGS) $(REQBOOL) $(REQTREE) -c AVLTree/AVLTree.c -o $@
+	@ echo Compiling AVLTree Library
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQTREE) -c AVLTree/AVLTree.c -o $@
 
 #Priority Queue
 
 bin/priorityQueueTest: $(PQUEOBJ) obj/test/priorityQueueTest.o
-	gcc $^ -o $@
+	@ echo Linking PriorityQueue test
+	@ gcc $^ -o $@
 
 obj/test/priorityQueueTest.o: PriorityQueue/priTest.c
-	gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQTREE) $(REQPQUE) -c PriorityQueue/priTest.c -o $@
+	@ echo Compiling Queue Test
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQTREE) $(REQPQUE) -c PriorityQueue/priTest.c -o $@
 
 obj/lib/PriorityQueue.o: PriorityQueue/PriorityQueue.c PriorityQueue/PriorityQueue.h
-	gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQTREE) $(REQPQUE) -c PriorityQueue/PriorityQueue.c -o $@
+	@ echo Compiling PriorityQueue library
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQLIST) $(REQTREE) $(REQPQUE) -c PriorityQueue/PriorityQueue.c -o $@
 
 #Stream
 
 bin/streamTest: $(STMPOBJ) obj/test/streamTest.o
-	gcc $^ -o $@
+	@ echo Linking Stream Test
+	@ gcc $^ -o $@
 
 obj/test/streamTest.o: Stream/streamTest.c
-	gcc $(CFLAGS) $(REQSTR) $(REQSTMP) $(REQBOOL) $(REQLIST) -c Stream/streamTest.c -o $@
+	@ echo Compiling Stream Test 
+	@ gcc $(CFLAGS) $(REQSTR) $(REQSTMP) $(REQBOOL) $(REQLIST) -c Stream/streamTest.c -o $@
 
 obj/lib/Stream.o: Stream/Stream.c Stream/Stream.h
-	gcc $(CFLAGS) $(REQSTR) $(REQSTMP) $(REQBOOL) $(REQLIST) -c Stream/Stream.c -o $@
+	@ echo Compiling Stream Library
+	@ gcc $(CFLAGS) $(REQSTR) $(REQSTMP) $(REQBOOL) $(REQLIST) -c Stream/Stream.c -o $@
 
 clean:
-	@ rm -rf deploy
+	@ rm -f libRussell.a
+	@ rm -f headers/*
 	@ rm -rf bin/*
 	@ rm -f obj/*/*.o

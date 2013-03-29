@@ -1,5 +1,7 @@
 #include "rString.h"
 
+#include <stdio.h>
+
 struct stringStruct
 {
 	List * characters;
@@ -1010,6 +1012,24 @@ double String_convertDouble(String * string)
 		return 0;
 
 	return atof(String_c(string));
+}
+
+String * String_fromInt(int integer)
+{
+	char buff[50];
+
+	sprintf(buff, "%d", integer);
+
+	return String_create(buff);
+}
+
+String * String_fromDouble(double aDouble)
+{
+	char buff[50];
+
+	sprintf(buff, "%lf", aDouble);
+
+	return String_create(buff);
 }
 
 String * String_listToString(List * list, String * (*toString)(void *))

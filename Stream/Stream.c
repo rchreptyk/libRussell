@@ -1,6 +1,8 @@
 
 #include "Stream.h"
 
+#include <string.h>
+
 struct streamStruct {
 	FILE * stream;
 
@@ -11,6 +13,9 @@ struct streamStruct {
 
 Stream * Stream_openFile(String * filename, StreamMode streamMode, AccessMode accessMode)
 {
+	FILE * fstream;
+	Stream * stream;
+
 	if(filename == NULL)
 		return NULL;
 
@@ -91,12 +96,12 @@ Stream * Stream_openFile(String * filename, StreamMode streamMode, AccessMode ac
 	if(mode == NULL)
 		return NULL;
 
-	FILE * fstream = fopen(String_c(filename), mode);
+	fstream = fopen(String_c(filename), mode);
 
 	if(fstream == NULL)
 		return NULL;
 
-	Stream * stream = malloc(sizeof(Stream));
+	stream = malloc(sizeof(Stream));
 
 	if(stream == NULL)
 		return NULL;
@@ -111,7 +116,12 @@ Stream * Stream_openFile(String * filename, StreamMode streamMode, AccessMode ac
 
 Stream * Stream_openStdin()
 {
-	Stream * stream = malloc(sizeof(Stream));
+	Stream * stream;
+
+	stream = malloc(sizeof(Stream));
+
+	if(stream == NULL)
+		return NULL;
 
 	stream->stream = stdin;
 	stream->canSeek = false;
@@ -121,8 +131,28 @@ Stream * Stream_openStdin()
 	return stream;
 }
 
+Stream * Stream_openStdout()
+{
+	Stream * stream;
+
+	stream = malloc(sizeof(Stream));
+
+	if(stream == NULL)
+		return NULL;
+
+	stream->stream = stdout;
+	stream->canSeek = false;
+	stream->canWrite = true;
+	stream->canRead = false;
+
+	return stream;
+}
+
 Boolean Stream_close(Stream * stream)
 {
+	if(stream == NULL)
+		return false;
+
 	fclose(stream->stream);
 	free(stream);
 
@@ -142,12 +172,14 @@ char Stream_nextChar(Stream * stream)
 
 String * Stream_nextLine(Stream * stream)
 {
+	String * line;
+	char currentChar;
+
 	if(stream == NULL || !stream->canRead)
 		return NULL;
 
-	String * line = String_createEmpty();
-
-	char currentChar;
+	line = String_createEmpty();
+	
 	while((currentChar = fgetc(stream->stream)) != '\n' && currentChar != EOF)
 	{
 		String_appendChar(line, currentChar);
@@ -158,6 +190,10 @@ String * Stream_nextLine(Stream * stream)
 
 int Stream_nextInt(Stream * stream, Boolean * error)
 {
+	String * integer;
+	char currentChar;
+	int realInt;
+
 	if(stream == NULL || !stream->canRead)
 	{
 		if(error != NULL)
@@ -165,9 +201,8 @@ int Stream_nextInt(Stream * stream, Boolean * error)
 		return 0;
 	}
 
-	String * integer = String_createEmpty();
+	integer = String_createEmpty();
 
-	char currentChar;
 	while((currentChar = fgetc(stream->stream)) != EOF && !isdigit(currentChar));
 
 	if(currentChar == EOF)
@@ -187,33 +222,203 @@ int Stream_nextInt(Stream * stream, Boolean * error)
 	if(error != NULL)
 		*error = false;
 
-	int realInt = String_convertInt(integer);
+	realInt = String_convertInt(integer);
 
 	String_destroy(integer);
 
 	return realInt;
 }
 
-// Boolean Stream_writeLine(String * stream, String * line)
-// {
-// 	if(stream == NULL || line == NULL)
-// 		return false;
+double Stream_nextDouble(Stream * stream, Boolean * error)
+{
+	String * aDouble;
+	double realDouble;
+	char currentChar;
 
+	if(stream == NULL || !stream->canRead)
+	{
+		if(error != NULL)
+			*error = true;
+		return 0.0;
+	}
 
-// }
+	aDouble = String_createEmpty();
 
-// Boolean Stream_write(Stream * stream, String * string)
-// {
-// 	if(stream == NULL || string == NULL)
-// 		return false;
-// }
+	while((currentChar = fgetc(stream->stream)) != EOF && !isdigit(currentChar));
+
+	if(currentChar == EOF)
+	{
+		if(error != NULL)
+			*error = true;
+		return 0.0;
+	}
+
+	String_appendChar(aDouble, currentChar);
+
+	while(isdigit(currentChar = fgetc(stream->stream)))
+	{
+		String_appendChar(aDouble, currentChar);
+	}
+
+	if(currentChar == '.')
+	{
+		String_appendChar(aDouble, currentChar);
+
+		while(isdigit(currentChar = fgetc(stream->stream)))
+		{
+			String_appendChar(aDouble, currentChar);
+		}
+	}
+
+	realDouble = String_convertDouble(aDouble);
+
+	String_destroy(aDouble);
+
+	return realDouble;
+}
+
+Boolean Stream_writeChar(Stream * stream, char character)
+{
+	if(stream == NULL || character != EOF || !stream->canWrite)
+		return false;
+
+	fputc(character, stream->stream);
+
+	return true;
+}
+
+Boolean Stream_writeLineC(Stream * stream, char * line)
+{
+	if(stream == NULL || line == NULL || !stream->canWrite)
+		return false;
+
+	Stream_writeC(stream, line);
+
+	fputc('\n', stream->stream);
+
+	return true;
+}
+
+Boolean Stream_writeC(Stream * stream, char * string)
+{
+	int currentChar;
+
+	if(stream == NULL || string == NULL || !stream->canWrite)
+		return false;
+
+	for(currentChar = 0; string[currentChar] != '\0'; currentChar++)
+		fputc(string[currentChar], stream->stream);
+
+	return true;
+}
+
+Boolean Stream_writeLine(Stream * stream, String * line)
+{
+	if(stream == NULL || line == NULL)
+		return false;
+
+	return Stream_writeLineC(stream, String_c(line));
+}
+
+Boolean Stream_write(Stream * stream, String * string)
+{
+	if(stream == NULL || string == NULL)
+		return false;
+
+	return Stream_writeC(stream, String_c(string));
+}
+
+Boolean Stream_writeInt(Stream * stream, int integer)
+{
+	String * string;
+
+	if(stream == NULL || !stream->canWrite)
+		return false;
+	
+	string = String_fromInt(integer);
+
+	if(string == NULL)
+		return false;
+
+	return Stream_write(stream, string);
+}
+
+Boolean Stream_writeDouble(Stream * stream, double aDouble)
+{
+	String * string;
+
+	if(stream == NULL || !stream->canWrite)
+		return false;
+
+	string = String_fromDouble(aDouble);
+
+	if(string == NULL)
+		return false;
+
+	return Stream_write(stream, string);
+}
+
+Boolean Stream_printf(Stream * stream, char * format, ... )
+{
+	int i, length;
+	int myInt;
+	va_list arguments;
+
+	if(stream == NULL || format == NULL)
+		return false;
+
+	va_start(arguments, format);
+
+	length = strlen(format);
+
+	for(i = 0; i < length; i++)
+	{
+		if(format[i] == '%' && i + 1 < length)
+		{
+			i++;
+			switch(format[i])
+			{
+				case 'd':
+				case 'i':
+					myInt =  va_arg(arguments, int);
+					printf("%d\n", myInt);
+					Stream_writeInt(stream, myInt);
+					break;
+				case 'f':
+					Stream_writeDouble(stream, va_arg(arguments, double));
+					break;
+				case 's':
+					Stream_writeC(stream, va_arg(arguments, char *));
+					break;
+				case 'c':
+					Stream_writeChar(stream, va_arg(arguments, char));
+					break;
+				case 'r':
+					Stream_write(stream, va_arg(arguments, String *));
+					break;
+				default:
+					Stream_writeChar(stream, format[i]);
+			}
+		}
+		else
+		{
+			fputc(format[i], stream->stream);
+		}
+	}
+
+	va_end(arguments);
+
+	return true;
+}
 
 Boolean Stream_fileExists(String * filename)
 {
+	FILE * test;
+
 	if(filename == NULL)
 		return false;
 
-	FILE * test = fopen(String_c(filename), "r");
+	test = fopen(String_c(filename), "r");
 
 	if(test != NULL)
 	{

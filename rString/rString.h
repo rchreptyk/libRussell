@@ -136,6 +136,10 @@ int String_convertInt(String *);
 
 double String_convertDouble(String *);
 
+String * String_fromInt(int integer);
+
+String * String_fromDouble(double aDouble);
+
 String * String_listToString(List *, String * (*toString)(void *));
 
 String * String_voidToString(void * v);
