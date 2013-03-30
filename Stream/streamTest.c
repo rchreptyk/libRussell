@@ -4,11 +4,14 @@
 
 int main()
 {
-	Stream * stream = Stream_openStdout();
+	Stream * stream = Stream_openStdin();
+	Stream * out = Stream_openStdout();
+	String * line;
 
-	String * myString = String_create("Hellooo");
-
-	Stream_printf(stream, "Hello %r %d %f Bla.\n", myString, 2423, 34.34);
+	while((line = Stream_nextWord(stream)))
+	{
+		Stream_printf(out, "%r\n", line);
+	}
 
 	return 0;
 }

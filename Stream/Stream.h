@@ -29,6 +29,8 @@ Boolean Stream_close(Stream * stream);
 
 char Stream_nextChar(Stream * stream);
 
+String * Stream_nextWord(Stream * stream);
+
 String * Stream_nextLine(Stream * stream);
 
 int Stream_nextInt(Stream * stream, Boolean * error); 

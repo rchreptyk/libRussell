@@ -170,6 +170,32 @@ char Stream_nextChar(Stream * stream)
 	return fgetc(stream->stream);
 }
 
+String * Stream_nextWord(Stream * stream)
+{
+	String * line;
+	char currentChar;
+
+	if(stream == NULL || !stream->canRead)
+		return NULL;
+
+	line = String_createEmpty();
+
+	while(isspace(currentChar = fgetc(stream->stream)));
+
+	if(currentChar == EOF)
+	{
+		String_destroy(line);
+		return NULL;
+	}
+
+	String_appendChar(line, currentChar);
+
+	while(!isspace(currentChar = fgetc(stream->stream)) && currentChar != EOF)
+		String_appendChar(line, currentChar);
+
+	return line;
+}
+
 String * Stream_nextLine(Stream * stream)
 {
 	String * line;
@@ -180,6 +206,20 @@ String * Stream_nextLine(Stream * stream)
 
 	line = String_createEmpty();
 	
+	currentChar = fgetc(stream->stream);
+	if(currentChar == EOF)
+	{
+		String_destroy(line);
+		return NULL;
+	}
+
+	if(currentChar == '\n')
+	{
+		return line;
+	}
+
+	String_appendChar(line, currentChar);
+
 	while((currentChar = fgetc(stream->stream)) != '\n' && currentChar != EOF)
 	{
 		String_appendChar(line, currentChar);
@@ -391,7 +431,7 @@ Boolean Stream_printf(Stream * stream, char * format, ... )
 					Stream_writeC(stream, va_arg(arguments, char *));
 					break;
 				case 'c':
-					Stream_writeChar(stream, va_arg(arguments, char));
+					Stream_writeChar(stream, va_arg(arguments, int));
 					break;
 				case 'r':
 					Stream_write(stream, va_arg(arguments, String *));
