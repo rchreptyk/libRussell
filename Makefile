@@ -9,6 +9,9 @@ REQBOOL = -IBoolean
 REQLIST = -IList
 LISTOBJ = obj/lib/List.o
 
+REQARRLIST = -IArrayList
+ARRLISTOBJ = obj/lib/ArrayList.o
+
 REQSTR = -IrString
 STROBJ = $(LISTOBJ) obj/lib/rString.o
 
@@ -28,8 +31,8 @@ STMPOBJ = $(STROBJ) obj/lib/Stream.o
 REQSTMP = -IStream
 
 all: libs tests
-libs: $(LISTOBJ) $(STROBJ) $(HASHOBJ) $(QUEOBJ) $(TREEOBJ) $(PQUEOBJ) $(STMPOBJ)
-tests: bin/listTest bin/rStringTest bin/hashTableTest bin/queueTest bin/avlTreeTest bin/priorityQueueTest bin/streamTest 
+libs: $(LISTOBJ) $(STROBJ) $(HASHOBJ) $(QUEOBJ) $(TREEOBJ) $(PQUEOBJ) $(STMPOBJ) $(ARRLISTOBJ)
+tests: bin/listTest bin/rStringTest bin/hashTableTest bin/queueTest bin/avlTreeTest bin/priorityQueueTest bin/streamTest bin/arrayListTest
 
 
 deploy: clean libs
@@ -43,10 +46,10 @@ deploy: clean libs
 	@ echo link your code with libRussell.a
 	@ echo
 
-listTest : bin/listTest
-rStringTest : bin/rStringTest
-hashTableTest : bin/hashTableTest
-listTest : bin/listTest
+# listTest : bin/listTest
+# rStringTest : bin/rStringTest
+# hashTableTest : bin/hashTableTest
+
 
 
 # List
@@ -62,6 +65,20 @@ obj/lib/List.o: List/List.c List/List.h
 obj/test/listTest.o: List/listTest.c
 	@ echo Compiling List Test
 	@ gcc $(CFLAGS) $(REQBOOL) $(REQLIST) -c List/listTest.c -o $@
+
+# ArrayList
+
+bin/arrayListTest: $(ARRLISTOBJ) obj/test/arrayListTest.o
+	@ echo Linking ArrayListTest 
+	@ gcc $(CFLAGS) $^ -o $@
+
+obj/lib/ArrayList.o: ArrayList/ArrayList.c ArrayList/ArrayList.h
+	@ echo Compiling ArrayList Library
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQARRLIST) -c ArrayList/ArrayList.c -o $@
+
+obj/test/arrayListTest.o: ArrayList/ArrayListTest.c
+	@ echo Compiling Array List Test
+	@ gcc $(CFLAGS) $(REQBOOL) $(REQARRLIST) -c ArrayList/ArrayListTest.c -o $@
 
 # String
 
