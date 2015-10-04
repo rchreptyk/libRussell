@@ -196,7 +196,7 @@ void * List_removeFront(List * list)
     void * data;
     
     if(list == NULL)
-        return false;
+        return NULL;
     
     nodeToRemove = detachFront(list);
     if(nodeToRemove == NULL)

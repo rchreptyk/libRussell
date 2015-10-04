@@ -126,7 +126,7 @@ void * HashTable_removeValue(HashTable * table, String * key)
 	void * data;
 
 	if(table == NULL || key == NULL)
-		return false;
+		return NULL;
 
 	tmpPair = KeyValuePair_create(key);
 	currentList = table->table[hash(key, table->size)];
